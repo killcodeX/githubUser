@@ -3,13 +3,14 @@ import styled from "styled-components";
 import { MdSearch } from "react-icons/md";
 import { GithubContext } from "../context/context";
 const Search = () => {
-  const { request, error } = React.useContext(GithubContext);
+  const { request, error, serachGithubUser } = React.useContext(GithubContext);
 
   const [user, setUser] = React.useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (user) {
+      serachGithubUser(user)
     }
   };
 
