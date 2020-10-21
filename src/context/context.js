@@ -41,13 +41,27 @@ const GithubProvider = ({ children }) => {
   const serachGithubUser = async (user) => {
     // toggle error
     toggleError();
-    setIsLoading(true)
+    setIsLoading(true);
     // setLoadingError
     const response = await axios(`${rootUrl}/users/${user}`).catch((err) =>
       console.log(err)
     );
     if (response) {
       setGithubUser(response.data);
+      const { login, followers_url } = response.data;
+
+      await Promise.allSettled([
+        axios(`${rootUrl}/users/${login}/repos?perpage=100`),
+        axios(`${followers_url}?perpage=100`),
+      ]).then((result) => {
+        const [repos, followers] = result;
+        if(repos.status === 'fulfilled'){
+          setRepos(repos.value.data)
+        }
+        if(followers.status === 'fulfilled'){
+          setFollowers(followers.value.data)
+        }
+      })
     } else {
       toggleError(true, "there is no user with that username");
     }
@@ -55,8 +69,6 @@ const GithubProvider = ({ children }) => {
     checkRequest();
     setIsLoading(false);
   };
-
-  
 
   // error
   const [error, setError] = useState({ show: false, msg: "" });
@@ -70,7 +82,15 @@ const GithubProvider = ({ children }) => {
 
   return (
     <GithubContext.Provider
-      value={{ githubUser, repos, followers, request, error, serachGithubUser, isLoading }}
+      value={{
+        githubUser,
+        repos,
+        followers,
+        request,
+        error,
+        serachGithubUser,
+        isLoading,
+      }}
     >
       {children}
     </GithubContext.Provider>
