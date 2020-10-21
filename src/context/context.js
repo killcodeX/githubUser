@@ -13,16 +13,24 @@ const GithubProvider = ({ children }) => {
   const [repos, setRepos] = useState(mockRepos);
   const [followers, setFollowers] = useState(mockFollowers);
 
+  // request loading
+  const [request, setrequest] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
   // check rate
   const checkRequest = () => {
     axios(`${rootUrl}/rate_limit`)
-      .then(({data}) => {
-          let {rate : { remaining },
+      .then(({ data }) => {
+        let {
+          rate: { remaining },
         } = data;
 
-        setrequest(remaining)
-        if(remaining === 0){
-          toggleError(true, 'sorry, youhave exceeded your hourly rate limit !')
+        setrequest(remaining);
+        if (remaining === 0) {
+          toggleError(
+            true,
+            "sorry, you have exceeded your hourly rate limit !"
+          );
         }
       })
       .catch((err) => console.log(err));
@@ -32,31 +40,38 @@ const GithubProvider = ({ children }) => {
 
   const serachGithubUser = async (user) => {
     // toggle error
+    toggleError();
+    setIsLoading(true)
     // setLoadingError
-    const response  = await axios(`${rootUrl}/users/${user}`).catch(err => console.log(err))
-    if (response){
-      setGithubUser(response.data)
-    }else{
-      toggleError(true, 'there is no user with that username')
+    const response = await axios(`${rootUrl}/users/${user}`).catch((err) =>
+      console.log(err)
+    );
+    if (response) {
+      setGithubUser(response.data);
+    } else {
+      toggleError(true, "there is no user with that username");
     }
-  }
 
-  // request loading
-  const [request, setrequest] = useState(0);
-  const [loading, setLoading] = useState(false);
+    checkRequest();
+    setIsLoading(false);
+  };
+
+  
 
   // error
-  const [error, setError] = useState({show:false, msg:''})
+  const [error, setError] = useState({ show: false, msg: "" });
 
-  function toggleError(show = false, msg = ''){
-    setError({show,msg})
+  function toggleError(show = false, msg = "") {
+    setError({ show, msg });
   }
 
   // error
   useEffect(checkRequest, []);
 
   return (
-    <GithubContext.Provider value={{ githubUser, repos, followers, request, error, serachGithubUser }}>
+    <GithubContext.Provider
+      value={{ githubUser, repos, followers, request, error, serachGithubUser, isLoading }}
+    >
       {children}
     </GithubContext.Provider>
   );
