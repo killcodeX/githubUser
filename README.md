@@ -28,4 +28,4 @@ http://localhost:3000
 You can also check the demo on [GitHub Users](https://react-githubuser-101.netlify.app)
 
 ## ScreenShots
-![GitHub Users](https://github.com/killcodeX/spaceXhistory/blob/master/public/spaceship.png)
+![GitHub Users](https://github.com/killcodeX/githubUser/blob/master/public/screen.png)
